@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.util.Assert;
 
 import domain.Curricula;
 import domain.CustomRecord;
@@ -32,6 +33,8 @@ import utilities.AbstractTest;
 @Transactional
 public class CurriculaTest extends AbstractTest {
 
+	//The SUT
+	
 	@Autowired
 	private CurriculaService		curriculaService;
 
@@ -46,18 +49,56 @@ public class CurriculaTest extends AbstractTest {
 
 	@Autowired
 	private StyleRecordService		styleRecordService;
+	
+	//Templates
+	
+	/*
+	 * 7.1: A dancer must be able to manage his or her curricula: listing, creating, editing and deleting.
+	 */
+	protected void template(final String username, final PersonalRecord personalRecord, final List<CustomRecord> customRecord, final List<EndorserRecord> endorserRecord, List<StyleRecord> styleRecord,
+			final String editing1, final String editing2, final Class<?> expected) {
+		Class<?> caught = null;
 
+		try {
+			authenticate(username);
+			
+			Assert.isTrue(username == "dancer1" || username == "dancer2" || username == "dancer3");
+			curriculaService.findAll();
 
-	//Caso de uso positivo crear y guardar una curricula con personalRecord
+			Curricula curricula = curriculaService.create();
+			curricula.setPersonalRecord(personalRecord);
+			curricula.setCustomRecord(customRecord);
+			curricula.setEndorserRecord(endorserRecord);
+			curricula.setStyleRecord(styleRecord);
+
+			curriculaService.save(curricula);
+			
+			curricula.getPersonalRecord().setFullName(editing1);
+			curricula.getPersonalRecord().setEmail(editing2);
+			
+			curriculaService.flush();
+
+			unauthenticate();
+
+		} catch (final Throwable oops) {
+			caught = oops.getClass();
+		}
+
+		checkExceptions(expected, caught);
+	}
+
+	//Drivers
+
+	//Test #01: Test with one personal record. Expected true.
 	@Test
 	public void positiveTest0() {
 		PersonalRecord personalrecord = personalRecordService.clone(personalRecordService.findAll().iterator().next());
 
-		template("dancer1", personalrecord, new ArrayList<CustomRecord>(), new ArrayList<EndorserRecord>(), new ArrayList<StyleRecord>(), null);
+		template("dancer1", personalrecord, new ArrayList<CustomRecord>(), new ArrayList<EndorserRecord>(), new ArrayList<StyleRecord>(), "name", "mail@mail.com", null);
 
 	}
 
-	//Caso de uso positivo crear y guardar una curricula con 2 CustomRecord
+	//Test #02: Test with one personal record and two custom records. Expected true.
 	@Test
 	public void positiveTest1() {
 		PersonalRecord personalrecord = personalRecordService.clone(personalRecordService.findAll().iterator().next());
@@ -65,11 +106,11 @@ public class CurriculaTest extends AbstractTest {
 
 		copyCustom.add(customRecordService.clone(customRecordService.findAll().iterator().next()));
 		copyCustom.add(customRecordService.clone(customRecordService.findAll().iterator().next()));
-		template("dancer3", personalrecord, copyCustom, new ArrayList<EndorserRecord>(), new ArrayList<StyleRecord>(), null);
+		template("dancer3", personalrecord, copyCustom, new ArrayList<EndorserRecord>(), new ArrayList<StyleRecord>(), "name", "mail@mail.com", null);
 
 	}
 
-	//Caso de uso positivo crear y guardar una curricula con 2 endorserRecord
+	//Test #03: Test with one personal record and two endorser records. Expected true.
 
 	@Test
 	public void positiveTest2() {
@@ -82,11 +123,11 @@ public class CurriculaTest extends AbstractTest {
 
 		endorserRecordsCopy.add(endorserRecordService.clone(endorserRecordService.findAll().iterator().next()));
 		endorserRecordsCopy.add(endorserRecordService.clone(endorserRecordService.findAll().iterator().next()));
-		template("dancer3", personalrecord, copyCustom, endorserRecordsCopy, new ArrayList<StyleRecord>(), null);
+		template("dancer3", personalrecord, copyCustom, endorserRecordsCopy, new ArrayList<StyleRecord>(), "name", "mail@mail.com", null);
 
 	}
 
-	//Caso de uso positivo crear y guardar una curricula con 2 styleRecord y completa
+	//Test #04: Test with records from all categories. Expected true.
 	@Test
 	public void positiveTest4() {
 		PersonalRecord personalrecord = personalRecordService.clone(personalRecordService.findAll().iterator().next());
@@ -102,70 +143,63 @@ public class CurriculaTest extends AbstractTest {
 
 		styleRecords.add(styleRecordService.clone(styleRecordService.findAll().iterator().next()));
 		styleRecords.add(styleRecordService.clone(styleRecordService.findAll().iterator().next()));
-		template("dancer3", personalrecord, copyCustom, endorserRecordsCopy, styleRecords, null);
+		template("dancer3", personalrecord, copyCustom, endorserRecordsCopy, styleRecords, "name", "mail@mail.com", null);
 
 	}
 
-	//Caso de uso negativo crear una curricula sin personal record
+	//Test #05: Attempt to create a curriculum with no personal record. Expected false.
 	@Test
 	public void negativeTest0() {
 
-		template("dancer3", null, new ArrayList<CustomRecord>(), new ArrayList<EndorserRecord>(), new ArrayList<StyleRecord>(), ConstraintViolationException.class);
+		template("dancer3", null, new ArrayList<CustomRecord>(), new ArrayList<EndorserRecord>(), new ArrayList<StyleRecord>(), "name", "mail@mail.com", NullPointerException.class);
 
 	}
 
-	//Caso de uso negativo crear una curricula con null en customrecords
+	//Test #06: Attempt to create a null custom record. Expected false.
 	@Test
 	public void negativeTest1() {
 		PersonalRecord personalrecord = personalRecordService.clone(personalRecordService.findAll().iterator().next());
 
-		template("dancer2", personalrecord, null, new ArrayList<EndorserRecord>(), new ArrayList<StyleRecord>(), ConstraintViolationException.class);
+		template("dancer2", personalrecord, null, new ArrayList<EndorserRecord>(), new ArrayList<StyleRecord>(), "name", "mail@mail.com", ConstraintViolationException.class);
 
 	}
 
-	//Caso de uso negativo crear una curricula entrando con null en endorserRecords
+	//Test #07: Attempt to create a null endorser record. Expected false.
 	@Test
 	public void negativeTest2() {
 		PersonalRecord personalrecord = personalRecordService.clone(personalRecordService.findAll().iterator().next());
 
-		template("dancer1", personalrecord, new ArrayList<CustomRecord>(), null, new ArrayList<StyleRecord>(), ConstraintViolationException.class);
+		template("dancer1", personalrecord, new ArrayList<CustomRecord>(), null, new ArrayList<StyleRecord>(), "name", "mail@mail.com", ConstraintViolationException.class);
 
 	}
 
-	//Caso de uso positivo, crear varias curiculas
+	//Tetst #08: Attempt to create several curricula. Expected true.
 	@Test
 	public void driver() {
 		PersonalRecord personalrecord1 = personalRecordService.clone(personalRecordService.findAll().iterator().next());
 		PersonalRecord personalrecord2 = personalRecordService.clone(personalRecordService.findAll().iterator().next());
 		PersonalRecord personalrecord3 = personalRecordService.clone(personalRecordService.findAll().iterator().next());
-		template("dancer1", personalrecord1, new ArrayList<CustomRecord>(), new ArrayList<EndorserRecord>(), new ArrayList<StyleRecord>(), null);
-		template("dancer2", personalrecord2, new ArrayList<CustomRecord>(), new ArrayList<EndorserRecord>(), new ArrayList<StyleRecord>(), null);
-		template("dancer3", personalrecord3, new ArrayList<CustomRecord>(), new ArrayList<EndorserRecord>(), new ArrayList<StyleRecord>(), null);
+		template("dancer1", personalrecord1, new ArrayList<CustomRecord>(), new ArrayList<EndorserRecord>(), new ArrayList<StyleRecord>(), "name", "mail@mail.com", null);
+		template("dancer2", personalrecord2, new ArrayList<CustomRecord>(), new ArrayList<EndorserRecord>(), new ArrayList<StyleRecord>(), "name", "mail@mail.com", null);
+		template("dancer3", personalrecord3, new ArrayList<CustomRecord>(), new ArrayList<EndorserRecord>(), new ArrayList<StyleRecord>(), "name", "mail@mail.com", null);
 	}
+	
+	//Test #09: Attempt to edit a personal record with a null value. Expected false.
+	@Test
+	public void negativeTest3() {
+		PersonalRecord personalrecord = personalRecordService.clone(personalRecordService.findAll().iterator().next());
 
-	// Ancillary methods ------------------------------------------------------
-	protected void template(final String username, final PersonalRecord personalRecord, final List<CustomRecord> customRecord, final List<EndorserRecord> endorserRecord, List<StyleRecord> styleRecord, final Class<?> expected) {
-		Class<?> caught = null;
+		template("dancer1", personalrecord, new ArrayList<CustomRecord>(), null, new ArrayList<StyleRecord>(), null, "mail@mail.com", ConstraintViolationException.class);
 
-		try {
-			authenticate(username);
+	}
+	
+	//Test #10: Attempt to edit a personal record with an erroneous value. Expected false.
+	@Test
+	public void negativeTest4() {
+		PersonalRecord personalrecord = personalRecordService.clone(personalRecordService.findAll().iterator().next());
 
-			Curricula curricula = curriculaService.create();
-			curricula.setPersonalRecord(personalRecord);
-			curricula.setCustomRecord(customRecord);
-			curricula.setEndorserRecord(endorserRecord);
-			curricula.setStyleRecord(styleRecord);
+		template("dancer1", personalrecord, new ArrayList<CustomRecord>(), null, new ArrayList<StyleRecord>(), "name", "mail", ConstraintViolationException.class);
 
-			curriculaService.save(curricula);
-			curriculaService.flush();
-
-			unauthenticate();
-
-		} catch (final Throwable oops) {
-			caught = oops.getClass();
-		}
-
-		checkExceptions(expected, caught);
 	}
 
 }

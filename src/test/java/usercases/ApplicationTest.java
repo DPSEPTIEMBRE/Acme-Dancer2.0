@@ -1,4 +1,3 @@
-
 package usercases;
 
 import java.util.ArrayList;
@@ -31,6 +30,8 @@ import utilities.AbstractTest;
 @Transactional
 public class ApplicationTest extends AbstractTest {
 
+	//The SUT
+	
 	@Autowired
 	private ApplicationService	applicationService;
 
@@ -39,154 +40,14 @@ public class ApplicationTest extends AbstractTest {
 
 	@Autowired
 	private CurriculaService	curriculaService;
-
-
-	//Caso de uso positvo presentar varias solicitudes
-	@Test
-	public void driver() {
-		StatusApplication status = new StatusApplication();
-		status.setValue("PENDING");
-		RoleApplication role = new RoleApplication();
-		role.setRoleValue("TEACHER");
-
-		Curricula curricula1 = curriculaService.findAll().iterator().next();
-		Curricula curricula2 = curriculaService.findAll().iterator().next();
-		Curricula curricula3 = curriculaService.findAll().iterator().next();
-
-		Course course1 = courseService.findAll().iterator().next();
-		Course course2 = courseService.findAll().iterator().next();
-		Course course3 = courseService.findAll().iterator().next();
-
-		template("dancer1", new Date(), status, course1, role, curricula1, null);
-		template("dancer2", new Date(), status, course2, role, curricula2, null);
-		template("dancer3", new Date(), status, course3, role, curricula3, null);
-
-	}
-
-	//Caso de uso positivo presentarse a un curso como profesor
-	@Test
-	public void positiveTest0() {
-		StatusApplication status = new StatusApplication();
-		status.setValue("PENDING");
-		RoleApplication role = new RoleApplication();
-		role.setRoleValue("TEACHER");
-
-		Curricula curricula = curriculaService.findAll().iterator().next();
-
-		Course course = courseService.findAll().iterator().next();
-
-		template("dancer1", new Date(), status, course, role, curricula, null);
-
-	}
-
-	//Caso de uso presentarse a un curso como alumno
-	@Test
-	public void positiveTest1() {
-		StatusApplication status = new StatusApplication();
-		status.setValue("PENDING");
-		RoleApplication role = new RoleApplication();
-		role.setRoleValue("STUDENT");
-
-		Curricula curricula = curriculaService.findAll().iterator().next();
-
-		Course course = courseService.findAll().iterator().next();
-
-		template("dancer1", new Date(), status, course, role, curricula, null);
-
-	}
-	//Caso de uso positivo aceptar las solicitudes
-	@Test
-	public void positiveTest2() {
-
-		Course course = courseService.findAll().iterator().next();
-		StatusApplication status = new StatusApplication();
-		status.setValue("ACCEPTED");
-
-		Application application = applicationService.findAll().iterator().next();
-		application.setStatusApplication(status);
-		applicationService.save(application);
-		List<Application> aplicationCourse = new ArrayList<Application>();
-		aplicationCourse.add(application);
-		course.setApplications(aplicationCourse);
-		courseService.save(course);
-
-	}
-	//Caso de uso positivo denegar las solicitudes
-	@Test
-	public void positiveTest3() {
-
-		Course course = courseService.findAll().iterator().next();
-		StatusApplication status = new StatusApplication();
-		status.setValue("REJECTED");
-
-		Application application = applicationService.findAll().iterator().next();
-		application.setStatusApplication(status);
-		applicationService.save(application);
-		List<Application> aplicationCourse = new ArrayList<Application>();
-		aplicationCourse.add(application);
-		course.setApplications(aplicationCourse);
-		courseService.save(course);
-
-	}
-
-	//Caso de uso positivo presentarse a un curso como otro rol
-	@Test
-	public void negativeTest0() {
-		StatusApplication status = new StatusApplication();
-		status.setValue("PENDING");
-		RoleApplication role = new RoleApplication();
-		role.setRoleValue("ACME");
-
-		Curricula curricula = curriculaService.findAll().iterator().next();
-
-		Course course = courseService.findAll().iterator().next();
-
-		template("dancer1", new Date(), status, course, role, curricula, ConstraintViolationException.class);
-
-	}
-	//caso de uso negativo presentarse a un curso sin curso
-	@Test
-	public void negativeTest1() {
-		StatusApplication status = new StatusApplication();
-		status.setValue("PENDING");
-		RoleApplication role = new RoleApplication();
-		role.setRoleValue("TEACHER");
-
-		Curricula curricula = curriculaService.findAll().iterator().next();
-		template("dancer1", new Date(), status, null, role, curricula, ConstraintViolationException.class);
-
-	}
-
-	//caso de uso negativo presentarse a un curso con otro estado sin definir
-	@Test
-	public void negativeTest2() {
-		StatusApplication status = new StatusApplication();
-		status.setValue("ACME");
-		RoleApplication role = new RoleApplication();
-		role.setRoleValue("TEACHER");
-
-		Course course = courseService.findAll().iterator().next();
-		Curricula curricula = curriculaService.findAll().iterator().next();
-
-		template("dancer1", new Date(), status, course, role, curricula, ConstraintViolationException.class);
-
-	}
-
-	//caso de uso negativo presentarse a un curso con otro estado sin estado
-	@Test
-	public void negativeTest3() {
-
-		RoleApplication role = new RoleApplication();
-		role.setRoleValue("TEACHER");
-
-		Course course = courseService.findAll().iterator().next();
-		Curricula curricula = curriculaService.findAll().iterator().next();
-
-		template("dancer1", new Date(), null, course, role, curricula, ConstraintViolationException.class);
-
-	}
-
-	// Ancillary methods ------------------------------------------------------
+	
+	
+	//Templates
+	
+	/*
+	 * 7.2: A dancer can apply for a course as teacher or student.
+	 * 8.1: An academy can manage their applications, which means listing, accepting or rejecting them.
+	 */
 	protected void template(final String username, final Date createMoment, final StatusApplication statusApplication, final Course course, final RoleApplication role, final Curricula curricula, final Class<?> expected) {
 		Class<?> caught = null;
 
@@ -211,4 +72,153 @@ public class ApplicationTest extends AbstractTest {
 		checkExceptions(expected, caught);
 	}
 
+	//Drivers
+
+	//Test #01: Use case with several applications. Expected true.
+	@Test
+	public void driver() {
+		StatusApplication status = new StatusApplication();
+		status.setValue("PENDING");
+		RoleApplication role = new RoleApplication();
+		role.setRoleValue("TEACHER");
+
+		Curricula curricula1 = curriculaService.findAll().iterator().next();
+		Curricula curricula2 = curriculaService.findAll().iterator().next();
+		Curricula curricula3 = curriculaService.findAll().iterator().next();
+
+		Course course1 = courseService.findAll().iterator().next();
+		Course course2 = courseService.findAll().iterator().next();
+		Course course3 = courseService.findAll().iterator().next();
+
+		template("dancer1", new Date(), status, course1, role, curricula1, null);
+		template("dancer2", new Date(), status, course2, role, curricula2, null);
+		template("dancer3", new Date(), status, course3, role, curricula3, null);
+
+	}
+
+	//Test #02: Applying as teacher a single time. Expected true.
+	@Test
+	public void positiveTest0() {
+		StatusApplication status = new StatusApplication();
+		status.setValue("PENDING");
+		RoleApplication role = new RoleApplication();
+		role.setRoleValue("TEACHER");
+
+		Curricula curricula = curriculaService.findAll().iterator().next();
+
+		Course course = courseService.findAll().iterator().next();
+
+		template("dancer1", new Date(), status, course, role, curricula, null);
+
+	}
+
+	//Test #03: Applying as student a single time. Expected true.
+	@Test
+	public void positiveTest1() {
+		StatusApplication status = new StatusApplication();
+		status.setValue("PENDING");
+		RoleApplication role = new RoleApplication();
+		role.setRoleValue("STUDENT");
+
+		Curricula curricula = curriculaService.findAll().iterator().next();
+
+		Course course = courseService.findAll().iterator().next();
+
+		template("dancer1", new Date(), status, course, role, curricula, null);
+
+	}
+	
+	//Test #04: Accepting an application. Expected true.
+	@Test
+	public void positiveTest2() {
+
+		Course course = courseService.findAll().iterator().next();
+		StatusApplication status = new StatusApplication();
+		status.setValue("ACCEPTED");
+
+		Application application = applicationService.findAll().iterator().next();
+		application.setStatusApplication(status);
+		applicationService.save(application);
+		List<Application> aplicationCourse = new ArrayList<Application>();
+		aplicationCourse.add(application);
+		course.setApplications(aplicationCourse);
+		courseService.save(course);
+
+	}
+	
+	//Test #05: Rejecting an application. Expected true.
+	@Test
+	public void positiveTest3() {
+
+		Course course = courseService.findAll().iterator().next();
+		StatusApplication status = new StatusApplication();
+		status.setValue("REJECTED");
+
+		Application application = applicationService.findAll().iterator().next();
+		application.setStatusApplication(status);
+		applicationService.save(application);
+		List<Application> aplicationCourse = new ArrayList<Application>();
+		aplicationCourse.add(application);
+		course.setApplications(aplicationCourse);
+		courseService.save(course);
+
+	}
+
+	//Test #06: Attempt to apply as a different role. Expected false.
+	@Test
+	public void negativeTest0() {
+		StatusApplication status = new StatusApplication();
+		status.setValue("PENDING");
+		RoleApplication role = new RoleApplication();
+		role.setRoleValue("ACME");
+
+		Curricula curricula = curriculaService.findAll().iterator().next();
+
+		Course course = courseService.findAll().iterator().next();
+
+		template("dancer1", new Date(), status, course, role, curricula, ConstraintViolationException.class);
+
+	}
+	
+	//Test #07: Attempt to apply to a nonexistent course. Expected false.
+	@Test
+	public void negativeTest1() {
+		StatusApplication status = new StatusApplication();
+		status.setValue("PENDING");
+		RoleApplication role = new RoleApplication();
+		role.setRoleValue("TEACHER");
+
+		Curricula curricula = curriculaService.findAll().iterator().next();
+		template("dancer1", new Date(), status, null, role, curricula, ConstraintViolationException.class);
+
+	}
+
+	//Test #08: Attempt to apply to a course with a non defined status. Expected false.
+	@Test
+	public void negativeTest2() {
+		StatusApplication status = new StatusApplication();
+		status.setValue("ACME");
+		RoleApplication role = new RoleApplication();
+		role.setRoleValue("TEACHER");
+
+		Course course = courseService.findAll().iterator().next();
+		Curricula curricula = curriculaService.findAll().iterator().next();
+
+		template("dancer1", new Date(), status, course, role, curricula, ConstraintViolationException.class);
+
+	}
+
+	//Test #09: Attempt to apply to a course without a status. Expected false.
+	@Test
+	public void negativeTest3() {
+
+		RoleApplication role = new RoleApplication();
+		role.setRoleValue("TEACHER");
+
+		Course course = courseService.findAll().iterator().next();
+		Curricula curricula = curriculaService.findAll().iterator().next();
+
+		template("dancer1", new Date(), null, course, role, curricula, ConstraintViolationException.class);
+
+	}
 }

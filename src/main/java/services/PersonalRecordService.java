@@ -124,5 +124,15 @@ public class PersonalRecordService {
 		}
 		return res;
 	}
+	
+	public PersonalRecord clone(PersonalRecord p) {
+		PersonalRecord res = new PersonalRecord();
+		res.setNumWhatsapp(new String(p.getNumWhatsapp()));
+		res.setEmail(new String(p.getEmail()));
+		res.setFullName(new String(p.getFullName()));
+		res.setLinkedln(new String(p.getLinkedln()));
+
+		return personalRecordRepository.save(res);
+	}
 
 }

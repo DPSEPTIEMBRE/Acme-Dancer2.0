@@ -229,5 +229,9 @@ public class ApplicationService {
 	public Collection<Application> applicationsPendingOfCourse(int courseId) {
 		return applicationRepository.applicationsPendingOfCourse(courseId);
 	}
+	
+	public void flush(){
+		applicationRepository.flush();
+	}
 
 }

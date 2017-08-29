@@ -30,8 +30,9 @@ public class DancerService {
 	@Autowired
 	private DancerRepository	dancerRepository;
 
-	@Autowired
-	private Md5PasswordEncoder	md5PasswordEncoder;
+//	@Autowired
+//	private Md5PasswordEncoder	md5PasswordEncoder;
+	
 	//Services
 
 	@Autowired
@@ -91,7 +92,7 @@ public class DancerService {
 		} else {
 
 			UserAccount account = dancer.getUserAccount();
-			account.setPassword(md5PasswordEncoder.encodePassword(account.getPassword(), null));
+			account.setPassword(new Md5PasswordEncoder().encodePassword(account.getPassword(), null));
 
 			dancer.setUserAccount(account);
 

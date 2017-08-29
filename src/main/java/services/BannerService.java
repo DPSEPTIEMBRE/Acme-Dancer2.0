@@ -105,5 +105,9 @@ public class BannerService {
 	public List<Banner> listBannerActor(int a) {
 		return bannerRepository.listBannerActor(a);
 	}
+	
+	public void flush(){
+		bannerRepository.flush();
+	}
 
 }

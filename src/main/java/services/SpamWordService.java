@@ -60,4 +60,8 @@ public class SpamWordService {
 		return spamWordRepository.save(arg0);
 	}
 	
+	public void flush(){
+		spamWordRepository.flush();
+	}
+	
 }

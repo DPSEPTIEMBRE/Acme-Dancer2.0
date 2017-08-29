@@ -135,5 +135,14 @@ public class CustomRecordService {
 		}
 		return res;
 	}
+	
+	public CustomRecord clone(CustomRecord p) {
+		CustomRecord res = new CustomRecord();
+		res.setTitle(new String(p.getTitle()));
+		res.setText(new String(p.getText()));
+		res.setLinks(new ArrayList<String>(p.getLinks()));
+
+		return customRecordRepository.save(res);
+	}
 
 }

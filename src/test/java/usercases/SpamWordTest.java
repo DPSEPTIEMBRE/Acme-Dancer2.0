@@ -1,4 +1,3 @@
-
 package usercases;
 
 import javax.transaction.Transactional;
@@ -25,37 +24,11 @@ public class SpamWordTest extends AbstractTest {
 	@Autowired
 	private SpamWordService spamwordService;
 
-
-	//Caso de uso positivo crear un spam
-	@Test
-	public void positiveTest0() {
-
-		template("administrator", "shit", null);
-
-	}
-
-	@Test
-	public void positiveTest1() {
-
-		template("administrator", "fuck", null);
-
-	}
-	//Caso de uso negativo crear spam vacio
-	@Test
-	public void negativeTest0() {
-
-		template("administrator", "", ConstraintViolationException.class);
-
-	}
-
-	@Test
-	public void negativeTest1() {
-
-		template("administrator", null, ConstraintViolationException.class);
-
-	}
-
-	// Ancillary methods ------------------------------------------------------
+	//Templates
+	
+	/*
+	 * 10: The system must register spam words for the mail message filter.
+	 */
 	protected void template(final String username, final String name, final Class<?> expected) {
 		Class<?> caught = null;
 
@@ -74,5 +47,39 @@ public class SpamWordTest extends AbstractTest {
 		}
 
 		checkExceptions(expected, caught);
+	}
+	
+	//Drivers
+
+	//Test #01: Creation of spam word. Expected true.
+	@Test
+	public void positiveTest0() {
+
+		template("administrator", "shit", null);
+
+	}
+
+	//Test #02: Creation of spam word. Expected true.
+	@Test
+	public void positiveTest1() {
+
+		template("administrator", "fuck", null);
+
+	}
+	
+	//Test #03: Attempt to create an empty spam word. Expected false.
+	@Test
+	public void negativeTest0() {
+
+		template("administrator", "", ConstraintViolationException.class);
+
+	}
+
+	//Test #03: Attempt to create a null spam word. Expected false.
+	@Test
+	public void negativeTest1() {
+
+		template("administrator", null, ConstraintViolationException.class);
+
 	}
 }

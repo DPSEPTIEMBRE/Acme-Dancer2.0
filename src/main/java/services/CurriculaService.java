@@ -144,5 +144,9 @@ public class CurriculaService {
 		curriculaRepository.delete(curricula);
 
 	}
+	
+	public void flush(){
+		curriculaRepository.flush();
+	}
 
 }

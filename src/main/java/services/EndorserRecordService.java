@@ -132,5 +132,13 @@ public class EndorserRecordService {
 			}
 			return res;
 		}
+		
+		public EndorserRecord clone(EndorserRecord p) {
+			EndorserRecord res = new EndorserRecord();
+			res.setContact(new String(p.getContact()));
+			res.setFullName(new String(p.getFullName()));
+
+			return endorserRecordRepository.save(res);
+		}
 
 }

@@ -151,4 +151,12 @@ public class StyleRecordService {
 		return res;
 	}
 
+	public StyleRecord clone(StyleRecord p) {
+		StyleRecord res = new StyleRecord();
+
+		res.setNumYear(new Integer(p.getNumYear()));
+		res.setStyle(p.getStyle());
+
+		return styleRecordRepository.save(res);
+	}
 }

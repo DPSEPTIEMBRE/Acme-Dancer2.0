@@ -29,8 +29,8 @@ public class AcademyService {
 	@Autowired
 	private AcademyRepository	academyRepository;
 
-	@Autowired
-	private Md5PasswordEncoder	md5PasswordEncoder;
+//	@Autowired
+//	private Md5PasswordEncoder	md5PasswordEncoder;
 
 	@Autowired
 	private FolderService		folderService;
@@ -106,7 +106,7 @@ public class AcademyService {
 			aca = academyRepository.save(aca);
 		} else {
 			UserAccount account = academy.getUserAccount();
-			account.setPassword(md5PasswordEncoder.encodePassword(account.getPassword(), null));
+			account.setPassword(new Md5PasswordEncoder().encodePassword(account.getPassword(), null));
 
 			academy.setUserAccount(account);
 
